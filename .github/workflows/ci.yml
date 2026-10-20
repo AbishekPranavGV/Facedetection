@@ -1,0 +1,26 @@
+name: CI Face Detection & Classifier Validation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate XML Cascades
+        run: |
+          python -c "
+          import xml.etree.ElementTree as ET, glob
+          xmls = glob.glob('*.xml')
+          for x in xmls:
+              tree = ET.parse(x)
+              print(f'Cascade {x} is valid XML (root: {tree.getroot().tag})')
+          "
+      - name: Syntax compile scripts
+        run: python -m py_compile classifier.py generate_dataset.py script.py
